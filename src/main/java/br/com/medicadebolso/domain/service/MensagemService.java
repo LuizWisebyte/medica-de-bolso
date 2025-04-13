@@ -1,11 +1,16 @@
 package br.com.medicadebolso.domain.service;
 
-import br.com.medicadebolso.domain.Mensagem;
+import br.com.medicadebolso.domain.model.Mensagem;
 import br.com.medicadebolso.domain.dto.MensagemDTO;
+import br.com.medicadebolso.domain.model.Usuario;
+import br.com.medicadebolso.domain.model.Atendimento;
 import br.com.medicadebolso.domain.repository.MensagemRepository;
+import br.com.medicadebolso.domain.repository.UsuarioRepository;
+import br.com.medicadebolso.domain.repository.AtendimentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,15 +22,26 @@ public class MensagemService {
 
     @Autowired
     private MensagemRepository mensagemRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private AtendimentoRepository atendimentoRepository;
 
     @Transactional
     public MensagemDTO enviarMensagem(MensagemDTO mensagemDTO) {
+        Usuario remetente = usuarioRepository.findById(mensagemDTO.getUsuarioId())
+            .orElseThrow(() -> new EntityNotFoundException("Remetente não encontrado com ID: " + mensagemDTO.getUsuarioId()));
+        
+        Atendimento atendimento = null;
+        if (mensagemDTO.getAtendimentoId() != null) {
+            atendimento = atendimentoRepository.findById(mensagemDTO.getAtendimentoId())
+                .orElseThrow(() -> new EntityNotFoundException("Atendimento não encontrado com ID: " + mensagemDTO.getAtendimentoId()));
+        }
+
         Mensagem mensagem = new Mensagem();
-        mensagem.setUsuarioId(mensagemDTO.getUsuarioId());
-        mensagem.setTitulo(mensagemDTO.getTitulo());
+        mensagem.setRemetente(remetente);
+        mensagem.setAtendimento(atendimento);
         mensagem.setConteudo(mensagemDTO.getConteudo());
-        mensagem.setDataEnvio(LocalDateTime.now());
-        mensagem.setLida(false);
         
         mensagem = mensagemRepository.save(mensagem);
         return convertToDTO(mensagem);
@@ -34,29 +50,32 @@ public class MensagemService {
     private MensagemDTO convertToDTO(Mensagem mensagem) {
         MensagemDTO dto = new MensagemDTO();
         dto.setId(mensagem.getId());
-        dto.setUsuarioId(mensagem.getUsuarioId());
-        dto.setAtendimentoId(mensagem.getAtendimentoId());
-        dto.setTitulo(mensagem.getTitulo());
+        if (mensagem.getRemetente() != null) {
+            dto.setUsuarioId(mensagem.getRemetente().getId());
+        }
+        if (mensagem.getAtendimento() != null) {
+             dto.setAtendimentoId(mensagem.getAtendimento().getId());
+        }
         dto.setConteudo(mensagem.getConteudo());
         dto.setLida(mensagem.isLida());
         dto.setDataEnvio(mensagem.getDataEnvio());
         return dto;
     }
 
-    public List<Mensagem> buscarMensagensPorUsuario(UUID usuarioId) {
-        return mensagemRepository.findByUsuarioId(usuarioId);
+    public List<Mensagem> buscarMensagensPorRemetente(Long remetenteId) {
+        return mensagemRepository.findByRemetenteId(remetenteId);
     }
 
-    public List<Mensagem> buscarMensagensNaoLidasPorUsuario(UUID usuarioId) {
-        return mensagemRepository.findByUsuarioIdAndLidaFalse(usuarioId);
+    public List<Mensagem> buscarMensagensNaoLidasPorRemetente(Long remetenteId) {
+        return mensagemRepository.findByRemetenteIdAndLidaFalse(remetenteId);
     }
 
-    public Long contarMensagensNaoLidasPorUsuario(UUID usuarioId) {
-        return mensagemRepository.countByUsuarioIdAndLidaFalse(usuarioId);
+    public Long contarMensagensNaoLidasPorRemetente(Long remetenteId) {
+        return mensagemRepository.countByRemetenteIdAndLidaFalse(remetenteId);
     }
 
     @Transactional
-    public void marcarComoLida(UUID mensagemId) {
+    public void marcarComoLida(Long mensagemId) {
         mensagemRepository.findById(mensagemId).ifPresent(mensagem -> {
             mensagem.setLida(true);
             mensagemRepository.save(mensagem);
@@ -72,8 +91,8 @@ public class MensagemService {
     }
 
     @Transactional
-    public void marcarMensagensComoLidas(Long atendimentoId, Long usuarioId) {
-        List<Mensagem> mensagens = mensagemRepository.findByAtendimentoIdAndUsuarioId(atendimentoId, UUID.fromString(usuarioId.toString()));
+    public void marcarMensagensComoLidas(Long atendimentoId, Long remetenteId) {
+        List<Mensagem> mensagens = mensagemRepository.findByAtendimentoIdAndRemetenteId(atendimentoId, remetenteId);
         mensagens.forEach(mensagem -> {
             mensagem.setLida(true);
             mensagemRepository.save(mensagem);

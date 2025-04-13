@@ -1,28 +1,51 @@
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+// import { parseCookies } from 'nookies'; // Removido - Usando localStorage por enquanto
+// import { signOut } from '../contexts/AuthContext'; // Removido - Função não existe/evitar dependência circular
 
-const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor para adicionar token JWT
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Interceptor para adicionar o token JWT às requisições
+api.interceptors.request.use(
+  (config) => {
+    // Tenta obter o token do localStorage (ou de onde quer que seja armazenado)
+    const token = localStorage.getItem('authToken');
+    
+    // Adiciona o cabeçalho Authorization se o token existir
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('[Axios Interceptor] Token adicionado ao cabeçalho Authorization.');
+    } else {
+      console.log('[Axios Interceptor] Nenhum token encontrado para adicionar ao cabeçalho.');
+    }
+    
+    return config;
+  },
+  (error) => {
+    // Tratar erro na configuração da requisição
+    console.error('[Axios Interceptor] Erro ao configurar requisição:', error);
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 // Interceptor para tratar erros
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response: AxiosResponse) => {
+    return response;
+  },
+  (error: AxiosError) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Ex: Limpar token e redirecionar para login
+      console.error('[Axios Interceptor] Erro 401 - Não autorizado. Redirecionando para login...');
+      localStorage.removeItem('authToken');
+      // Idealmente, chamar a função logout do AuthContext, mas pode ser complexo aqui
+      // window.location.href = '/login'; 
     }
     return Promise.reject(error);
   }
@@ -30,11 +53,11 @@ api.interceptors.response.use(
 
 export const authService = {
   login: async (email: string, password: string) => {
-    const response = await api.post('/auth/authenticate', { email, password });
+    const response = await api.post('/auth/login', { email, password });
     return response.data;
   },
   register: async (nome: string, email: string, password: string) => {
-    const response = await api.post('/auth/register', { nome, email, password });
+    const response = await api.post('/auth/registro', { nome, email, password });
     return response.data;
   },
 };

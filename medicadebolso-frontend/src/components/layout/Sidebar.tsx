@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FiHome, FiPill, FiCalendar, FiSettings } from 'react-icons/fi';
+import { FiHome, FiClipboard, FiCalendar, FiSettings } from 'react-icons/fi';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: FiHome },
-  { name: 'Medicamentos', href: '/medicamentos', icon: FiPill },
+  { name: 'Medicamentos', href: '/medicamentos', icon: FiClipboard },
   { name: 'Agenda', href: '/agenda', icon: FiCalendar },
   { name: 'Configurações', href: '/configuracoes', icon: FiSettings },
 ];

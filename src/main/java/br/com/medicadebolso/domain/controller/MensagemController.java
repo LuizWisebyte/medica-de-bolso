@@ -1,6 +1,6 @@
 package br.com.medicadebolso.domain.controller;
 
-import br.com.medicadebolso.domain.Mensagem;
+import br.com.medicadebolso.domain.model.Mensagem;
 import br.com.medicadebolso.domain.dto.MensagemDTO;
 import br.com.medicadebolso.domain.service.MensagemService;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/mensagens")
@@ -22,23 +21,23 @@ public class MensagemController {
         return ResponseEntity.ok(mensagemService.enviarMensagem(mensagemDTO));
     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Mensagem>> buscarMensagensPorUsuario(@PathVariable UUID usuarioId) {
-        return ResponseEntity.ok(mensagemService.buscarMensagensPorUsuario(usuarioId));
+    @GetMapping("/usuario/{remetenteId}")
+    public ResponseEntity<List<Mensagem>> buscarMensagensPorRemetente(@PathVariable Long remetenteId) {
+        return ResponseEntity.ok(mensagemService.buscarMensagensPorRemetente(remetenteId));
     }
 
-    @GetMapping("/usuario/{usuarioId}/nao-lidas")
-    public ResponseEntity<List<Mensagem>> buscarMensagensNaoLidasPorUsuario(@PathVariable UUID usuarioId) {
-        return ResponseEntity.ok(mensagemService.buscarMensagensNaoLidasPorUsuario(usuarioId));
+    @GetMapping("/usuario/{remetenteId}/nao-lidas")
+    public ResponseEntity<List<Mensagem>> buscarMensagensNaoLidasPorRemetente(@PathVariable Long remetenteId) {
+        return ResponseEntity.ok(mensagemService.buscarMensagensNaoLidasPorRemetente(remetenteId));
     }
 
-    @GetMapping("/usuario/{usuarioId}/contagem-nao-lidas")
-    public ResponseEntity<Long> contarMensagensNaoLidasPorUsuario(@PathVariable UUID usuarioId) {
-        return ResponseEntity.ok(mensagemService.contarMensagensNaoLidasPorUsuario(usuarioId));
+    @GetMapping("/usuario/{remetenteId}/contagem-nao-lidas")
+    public ResponseEntity<Long> contarMensagensNaoLidasPorRemetente(@PathVariable Long remetenteId) {
+        return ResponseEntity.ok(mensagemService.contarMensagensNaoLidasPorRemetente(remetenteId));
     }
 
     @PutMapping("/{mensagemId}/marcar-como-lida")
-    public ResponseEntity<Void> marcarComoLida(@PathVariable UUID mensagemId) {
+    public ResponseEntity<Void> marcarComoLida(@PathVariable Long mensagemId) {
         mensagemService.marcarComoLida(mensagemId);
         return ResponseEntity.ok().build();
     }

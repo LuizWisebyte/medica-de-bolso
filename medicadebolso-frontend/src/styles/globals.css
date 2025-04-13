@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Melhorias de acessibilidade e suporte mobile */
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-white text-gray-900;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
+}
+
+/* Melhorar a usabilidade em telas touch */
+input, 
+button, 
+select, 
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  margin: 0;
+  touch-action: manipulation;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Melhorar área clicável para mobile */
+a, button {
+  @apply p-1;
+  display: inline-block;
+}
+
+/* Melhorar foco visual para acessibilidade */
+:focus {
+  outline: 2px solid #b3b3b3;
+  outline-offset: 2px;
+}
+
+/* Remover outline para mouse, mas manter para teclado */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Remoção de autofill background para melhor experiência */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+} 

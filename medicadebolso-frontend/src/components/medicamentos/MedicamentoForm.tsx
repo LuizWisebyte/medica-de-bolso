@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiX, FiClock, FiAlertCircle } from 'react-icons/fi';
+import { Medicamento } from '../../types/medicamento';
 
-interface Medicamento {
-  id?: string;
+export type MedicamentoFormData = {
   nome: string;
-  dosagem: string;
+  dosagem: number;
   unidadeMedida: string;
   frequencia: string;
   horarios: string[];
   dataInicio: string;
   dataTermino?: string;
-}
+  observacoes?: string;
+};
 
 interface MedicamentoFormProps {
-  onSubmit: (medicamento: Medicamento) => void;
+  onSubmit: (medicamento: MedicamentoFormData) => void;
   onClose: () => void;
-  medicamento?: Medicamento | null;
+  medicamento?: Medicamento;
 }
 
 interface FormErrors {
@@ -30,14 +31,13 @@ interface FormErrors {
 }
 
 const MedicamentoForm = ({ onSubmit, onClose, medicamento }: MedicamentoFormProps) => {
-  const [formData, setFormData] = useState<Medicamento>({
+  const [formData, setFormData] = useState<MedicamentoFormData>({
     nome: '',
-    dosagem: '',
+    dosagem: 0,
     unidadeMedida: 'mg',
     frequencia: 'diária',
     horarios: [],
-    dataInicio: '',
-    dataTermino: '',
+    dataInicio: new Date().toISOString().split('T')[0],
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -58,8 +58,8 @@ const MedicamentoForm = ({ onSubmit, onClose, medicamento }: MedicamentoFormProp
       isValid = false;
     }
 
-    if (!formData.dosagem.trim()) {
-      newErrors.dosagem = 'Dosagem é obrigatória';
+    if (!formData.dosagem || formData.dosagem <= 0) {
+      newErrors.dosagem = 'Dosagem é obrigatória e deve ser maior que zero';
       isValid = false;
     }
 
@@ -106,10 +106,12 @@ const MedicamentoForm = ({ onSubmit, onClose, medicamento }: MedicamentoFormProp
     return isValid;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Limpa o erro quando o usuário começa a digitar
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'dosagem' ? Number(value) : value
+    }));
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
     }
