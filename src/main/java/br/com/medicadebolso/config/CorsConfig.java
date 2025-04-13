@@ -16,6 +16,9 @@ public class CorsConfig {
         
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:3000"); // Frontend URL
+        config.addAllowedOrigin("http://localhost:3001"); // Frontend URL alternativa
+        config.addAllowedOrigin("http://192.168.2.106:3000"); // Network URL
+        config.addAllowedOrigin("http://192.168.2.106:3001"); // Network URL alternativa
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         
