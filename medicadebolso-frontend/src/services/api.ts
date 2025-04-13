@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 // import { parseCookies } from 'nookies'; // Removido - Usando localStorage por enquanto
 // import { signOut } from '../contexts/AuthContext'; // Removido - Função não existe/evitar dependência circular
 
-const API_BASE_URL = 'http://localhost:8090/api';
+const API_BASE_URL = 'http://localhost:8080/api';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
