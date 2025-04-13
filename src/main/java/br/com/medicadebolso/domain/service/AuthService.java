@@ -83,8 +83,9 @@ public class AuthService {
         medico.setEmail(registroDTO.getEmail());
         medico.setCpf(registroDTO.getCpf());
         medico.setTelefone(registroDTO.getTelefone());
-        medico.setCrm(registroDTO.getCrm());
-        medico.setEspecialidade(registroDTO.getEspecialidade());
+        medico.setCrmNumero(registroDTO.getCrm());
+        medico.setCrmEstado(registroDTO.getCrmEstado());
+        medico.setEspecialidades(registroDTO.getEspecialidades());
         medico.setCurriculo(registroDTO.getCurriculo());
         medico.setFormacao(registroDTO.getFormacao());
         medico.setExperiencia(registroDTO.getExperiencia());

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import java.util.Set;
 
 @Data
 public class RegistroDTO {
@@ -37,7 +38,8 @@ public class RegistroDTO {
     
     // Campos específicos para Médico
     private String crm;
-    private String especialidade;
+    private String crmEstado;
+    private Set<String> especialidades;
     private String curriculo;
     private String formacao;
     private String experiencia;

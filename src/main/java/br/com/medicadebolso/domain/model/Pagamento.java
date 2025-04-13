@@ -23,34 +23,53 @@ public class Pagamento {
     private BigDecimal valor;
     
     @Column(nullable = false)
-    private LocalDateTime dataPagamento;
+    private BigDecimal valorBruto;
+    
+    @Column(nullable = false)
+    private BigDecimal valorLiquido;
+    
+    @Column(nullable = false)
+    private String metodoPagamento;
+    
+    @Column
+    private String observacoes;
     
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusPagamento status;
     
-    @Column(length = 100)
-    private String metodoPagamento;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private StatusDisponibilidade statusDisponibilidade;
     
-    @Column(length = 100)
+    @Column(nullable = false, unique = true)
     private String codigoTransacao;
     
-    @Column(length = 500)
-    private String observacoes;
+    @Column(nullable = false)
+    private LocalDateTime dataPagamento;
+    
+    @ManyToOne
+    @JoinColumn(name = "resgate_id")
+    private Resgate resgate;
     
     public enum StatusPagamento {
-        PENDENTE,
         PROCESSANDO,
         CONCLUIDO,
         CANCELADO,
-        REEMBOLSADO
+        REJEITADO
+    }
+    
+    public enum StatusDisponibilidade {
+        DISPONIVEL,
+        RESGATADO,
+        BLOQUEADO
     }
     
     @PrePersist
-    public void prePersist() {
-        this.dataPagamento = LocalDateTime.now();
-        if (this.status == null) {
-            this.status = StatusPagamento.PENDENTE;
-        }
+    protected void onCreate() {
+        dataPagamento = LocalDateTime.now();
+        statusDisponibilidade = StatusDisponibilidade.DISPONIVEL;
+        valorBruto = valor;
+        valorLiquido = valor.multiply(BigDecimal.valueOf(0.95)); // 5% de taxa
     }
 } 
