@@ -8,6 +8,9 @@ interface RegistroFormData {
     email: string;
     senha: string;
     confirmarSenha: string;
+    cpf: string;
+    telefone: string;
+    tipoUsuario: string;
     crm: string;
     crmEstado: string; // Ex: SP, RJ, MG
     // Adicionar outros campos se necessário (ex: especialidade)
@@ -19,6 +22,9 @@ const RegistroPage: React.FC = () => {
         email: '',
         senha: '',
         confirmarSenha: '',
+        cpf: '',
+        telefone: '',
+        tipoUsuario: 'MEDICO', // Definindo o tipo como médico por padrão
         crm: '',
         crmEstado: '',
     });
@@ -118,6 +124,34 @@ const RegistroPage: React.FC = () => {
                                 id="confirmarSenha"
                                 name="confirmarSenha"
                                 value={formData.confirmarSenha}
+                                onChange={handleChange}
+                                required
+                                className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label htmlFor="cpf" className="block text-sm font-medium text-gray-700">CPF</label>
+                            <input
+                                type="text"
+                                id="cpf"
+                                name="cpf"
+                                value={formData.cpf}
+                                onChange={handleChange}
+                                required
+                                className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label htmlFor="telefone" className="block text-sm font-medium text-gray-700">Telefone</label>
+                            <input
+                                type="text"
+                                id="telefone"
+                                name="telefone"
+                                value={formData.telefone}
                                 onChange={handleChange}
                                 required
                                 className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"

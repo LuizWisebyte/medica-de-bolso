@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.util.Set;
+import java.util.HashSet;
 
 @Data
 public class RegistroDTO {
@@ -39,7 +40,7 @@ public class RegistroDTO {
     // Campos específicos para Médico
     private String crm;
     private String crmEstado;
-    private Set<String> especialidades;
+    private Set<String> especialidades = new HashSet<>();
     private String curriculo;
     private String formacao;
     private String experiencia;

@@ -18,8 +18,8 @@ const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): React.F
                 if (currentPath !== '/login' && 
                     currentPath !== '/registro' && 
                     currentPath !== '/recuperar-senha') {
-                    console.log('[withAuth] Usuário não autenticado, redirecionando para /login');
-                    router.replace('/login');
+                    console.log('[withAuth] Usuário não autenticado, redirecionando para /Login');
+                    router.replace('/Login');
                 }
             }
         }, [isAuthenticated, loading, router]);

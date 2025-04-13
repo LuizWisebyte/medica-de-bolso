@@ -11,9 +11,14 @@ interface RegisterData {
     nome: string;
     email: string;
     senha: string; // Ou password
-    crm: string;
-    crmEstado: string;
-    // ... outros campos?
+    cpf: string; // Campo obrigatório adicionado
+    telefone: string; // Campo obrigatório adicionado
+    tipoUsuario: string; // Campo obrigatório adicionado (considerar usar um enum/tipo específico)
+    crm?: string; // Tornando opcionais ou ajustar lógica
+    crmEstado?: string; // Tornando opcionais ou ajustar lógica
+    // Adicionar outros campos conforme necessário, ex:
+    // especialidades?: string[];
+    // alergias?: string;
 }
 
 // Assumindo que a API retorna o token diretamente como string no corpo

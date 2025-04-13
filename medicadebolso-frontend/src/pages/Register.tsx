@@ -1,13 +1,18 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { api } from '../services/api';
+import { register } from '../services/authService';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [tipoUsuario, setTipoUsuario] = useState('PACIENTE');
+  const [crm, setCrm] = useState('');
+  const [crmEstado, setCrmEstado] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
@@ -21,19 +26,39 @@ export default function Register() {
       setError('As senhas não coincidem');
       return;
     }
+    
+    if (!cpf || !telefone || !tipoUsuario) {
+        setError('Por favor, preencha CPF, Telefone e Tipo de Usuário.');
+        return;
+    }
+    
+    if (tipoUsuario === 'MEDICO' && (!crm || !crmEstado)) {
+        setError('Por favor, preencha CRM e Estado do CRM para o tipo Médico.');
+        return;
+    }
 
     setIsLoading(true);
 
     try {
-      await api.post('/auth/register', {
-        name,
+      const userData: any = { 
+        nome: name,
         email,
-        password,
-      });
+        senha: password,
+        cpf,
+        telefone,
+        tipoUsuario,
+      };
 
-      router.push('/login?registered=true');
+      if (tipoUsuario === 'MEDICO') {
+        userData.crm = crm;
+        userData.crmEstado = crmEstado;
+      }
+
+      await register(userData);
+
+      router.push('/Login?registered=true');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao criar conta');
+      setError(err.message || 'Erro ao criar conta');
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +73,7 @@ export default function Register() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Ou{' '}
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link href="/Login" className="font-medium text-blue-600 hover:text-blue-500">
               faça login na sua conta existente
             </Link>
           </p>
@@ -86,6 +111,87 @@ export default function Register() {
                 placeholder="Email"
               />
             </div>
+            <div>
+              <label htmlFor="cpf" className="sr-only">
+                CPF
+              </label>
+              <input
+                id="cpf"
+                name="cpf"
+                type="text"
+                required
+                value={cpf}
+                onChange={(e) => setCpf(e.target.value)}
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="CPF"
+              />
+            </div>
+            <div>
+              <label htmlFor="telefone" className="sr-only">
+                Telefone
+              </label>
+              <input
+                id="telefone"
+                name="telefone"
+                type="tel"
+                required
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Telefone (com DDD)"
+              />
+            </div>
+            <div>
+              <label htmlFor="tipoUsuario" className="sr-only">
+                Tipo de Usuário
+              </label>
+              <select
+                id="tipoUsuario"
+                name="tipoUsuario"
+                required
+                value={tipoUsuario}
+                onChange={(e) => setTipoUsuario(e.target.value)}
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+              >
+                <option value="PACIENTE">Paciente</option>
+                <option value="MEDICO">Médico</option>
+              </select>
+            </div>
+            {tipoUsuario === 'MEDICO' && (
+              <>
+                <div>
+                  <label htmlFor="crm" className="sr-only">
+                    CRM
+                  </label>
+                  <input
+                    id="crm"
+                    name="crm"
+                    type="text"
+                    required={tipoUsuario === 'MEDICO'}
+                    value={crm}
+                    onChange={(e) => setCrm(e.target.value)}
+                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="Número CRM"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="crmEstado" className="sr-only">
+                    Estado CRM
+                  </label>
+                  <input
+                    id="crmEstado"
+                    name="crmEstado"
+                    type="text"
+                    maxLength={2}
+                    required={tipoUsuario === 'MEDICO'}
+                    value={crmEstado}
+                    onChange={(e) => setCrmEstado(e.target.value.toUpperCase())}
+                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="UF"
+                  />
+                </div>
+              </>
+            )}
             <div>
               <label htmlFor="password" className="sr-only">
                 Senha

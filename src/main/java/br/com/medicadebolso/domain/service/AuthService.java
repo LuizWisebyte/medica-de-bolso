@@ -12,9 +12,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class AuthService {
+    
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,24 +39,46 @@ public class AuthService {
     
     @Transactional
     public String registrar(RegistroDTO registroDTO) {
+        log.info("Tentativa de registro recebida para email: {}", registroDTO.getEmail());
+        log.debug("Dados recebidos para registro: {}", registroDTO);
+        
         if (usuarioRepository.existsByEmail(registroDTO.getEmail())) {
-            throw new RuntimeException("Email já cadastrado");
+            log.warn("Tentativa de registro falhou: Email {} já cadastrado.", registroDTO.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado");
         }
         
         if (usuarioRepository.existsByCpf(registroDTO.getCpf())) {
-            throw new RuntimeException("CPF já cadastrado");
+            log.warn("Tentativa de registro falhou: CPF {} já cadastrado.", registroDTO.getCpf());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já cadastrado");
         }
         
         Usuario usuario;
         if (registroDTO.getTipoUsuario() == TipoUsuario.PACIENTE) {
+            log.info("Criando novo usuário PACIENTE");
             usuario = criarPaciente(registroDTO);
         } else {
+            log.info("Criando novo usuário MEDICO");
+            if (registroDTO.getCrm() == null || registroDTO.getCrm().isBlank() || 
+                registroDTO.getCrmEstado() == null || registroDTO.getCrmEstado().isBlank()) {
+                log.warn("Tentativa de registro de MÉDICO falhou: CRM ou Estado do CRM não fornecidos.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CRM e Estado do CRM são obrigatórios para médicos.");
+            }
             usuario = criarMedico(registroDTO);
         }
         
+        log.info("Codificando senha para usuário {}", usuario.getEmail());
         usuario.setSenha(passwordEncoder.encode(registroDTO.getSenha()));
-        usuarioRepository.save(usuario);
         
+        log.info("Salvando usuário {} no banco de dados", usuario.getEmail());
+        try {
+            usuarioRepository.save(usuario);
+            log.info("Usuário {} salvo com sucesso.", usuario.getEmail());
+        } catch (Exception e) {
+            log.error("Erro ao salvar usuário {} no banco de dados: {}", usuario.getEmail(), e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao salvar usuário.", e);
+        }
+        
+        log.info("Gerando token JWT para usuário {}", usuario.getEmail());
         return jwtService.gerarToken(usuario);
     }
     

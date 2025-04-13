@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 // import { parseCookies } from 'nookies'; // Removido - Usando localStorage por enquanto
 // import { signOut } from '../contexts/AuthContext'; // Removido - Função não existe/evitar dependência circular
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = 'http://localhost:8090/api';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -52,12 +52,16 @@ api.interceptors.response.use(
 );
 
 export const authService = {
-  login: async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
+  login: async (email: string, senha: string) => {
+    const response = await api.post('/auth/login', { email, senha });
     return response.data;
   },
-  register: async (nome: string, email: string, password: string) => {
-    const response = await api.post('/auth/registro', { nome, email, password });
+  register: async (userData: any) => {
+    // Garantir que todos os campos obrigatórios estejam presentes
+    if (!userData.tipoUsuario) {
+      userData.tipoUsuario = 'MEDICO'; // Valor padrão se não for fornecido
+    }
+    const response = await api.post('/auth/registro', userData);
     return response.data;
   },
 };

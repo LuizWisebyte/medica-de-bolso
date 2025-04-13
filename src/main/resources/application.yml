@@ -1,24 +1,30 @@
 server:
-  port: 8080
+  port: 8090
 
 spring:
   application:
     name: medicadebolso
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/medicadebolso
+    url: jdbc:postgresql://localhost:5433/medicadebolso
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
   
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
   
   data:
     mongodb:
