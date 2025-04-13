@@ -94,7 +94,7 @@ public class FinanceiroService {
 
         // Adicionar pagamentos ao extrato
         List<Pagamento> pagamentos = pagamentoRepository
-                .findByConsultaMedicoIdAndStatusPagamentoAndDataPagamentoBetween(
+                .findByConsultaMedicoIdAndStatusAndDataPagamentoBetween(
                         medicoId,
                         Pagamento.StatusPagamento.CONCLUIDO,
                         inicio,

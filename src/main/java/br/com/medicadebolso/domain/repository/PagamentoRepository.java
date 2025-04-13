@@ -31,9 +31,9 @@ public interface PagamentoRepository extends JpaRepository<Pagamento, Long> {
     List<Pagamento> findByConsultaMedicoIdAndStatusDisponibilidade(
             Long medicoId, StatusDisponibilidade statusDisponibilidade);
 
-    List<Pagamento> findByConsultaMedicoIdAndStatusPagamentoAndDataPagamentoBetween(
-            Long medicoId, StatusPagamento statusPagamento, LocalDateTime inicio, LocalDateTime fim);
+    List<Pagamento> findByConsultaMedicoIdAndStatusAndDataPagamentoBetween(
+            Long medicoId, StatusPagamento status, LocalDateTime inicio, LocalDateTime fim);
             
-    List<Pagamento> findByStatusPagamentoAndStatusDisponibilidade(
-            StatusPagamento statusPagamento, StatusDisponibilidade statusDisponibilidade);
+    List<Pagamento> findByStatusAndStatusDisponibilidade(
+            StatusPagamento status, StatusDisponibilidade statusDisponibilidade);
 } 
